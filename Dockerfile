@@ -16,6 +16,8 @@ RUN git clone https://github.com/bdsx/bdsx.git /BDSx2/
 RUN cd $ROOT && \
     rm *.bat
 
+COPY entrypoint.sh /BDSx2/entrypoint.sh
+
 #################### PRODUCTION ####################
 FROM ubuntu:latest as production
 
@@ -69,6 +71,8 @@ VOLUME [ "/BDSx2" ]
 
 COPY --from=builder $ROOT $ROOT
 
+RUN chmod +x /BDSx2/entrypoint.sh
+
 WORKDIR /BDSx2
 
-CMD ["/bin/bash", "bdsx.sh", "BDSX_YES=true"]
+CMD ["/bin/bash", "entrypoint.sh"]
