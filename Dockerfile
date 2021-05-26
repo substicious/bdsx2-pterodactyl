@@ -54,7 +54,7 @@ RUN chmod +x /entrypoint.sh
 RUN useradd -m container
 
 RUN mkdir /home/container/BDSx2 && \
-    chown -R container:container /home/container/BDSx2
+    chown -R container:container /home/container/
 
 USER container
 
