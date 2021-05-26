@@ -4,7 +4,7 @@ FROM alpine:latest as builder
 
 USER root
 
-ENV ROOT="/home/BDSx2"
+ENV ROOT="/home/container/BDSx2"
 
 RUN mkdir -p $ROOT
 
@@ -15,7 +15,7 @@ RUN git clone https://github.com/bdsx/bdsx.git /home/BDSx2/
 RUN cd $ROOT && \
     rm *.bat
 
-COPY entrypoint.sh /home/BDSx2/entrypoint.sh
+COPY ./entrypoint.sh /home/container/BDSx2/entrypoint.sh
 
 #################### PRODUCTION ####################
 FROM ubuntu:latest as production
@@ -60,17 +60,17 @@ RUN wine64 msiexec /i wine-mono-6.1.1-x86.msi && \
 
 RUN rm *.msi
 
-RUN chmod +x /home/BDSx2/entrypoint.sh
+RUN chmod +x /home/container/BDSx2/entrypoint.sh
 
-ENV ROOT="/home/BDSx2"
+ENV ROOT="/home/container/BDSx2"
 
-VOLUME [ "/home/BDSx2" ]
+VOLUME [ "/home/container/BDSx2" ]
 
 COPY --from=builder $ROOT $ROOT
 
-USER bdsx2
-ENV USER=bdsx2 HOME=/home/BDSx2
+USER container
+ENV USER=container HOME=/home/container
 
-WORKDIR /home/BDSx2
+WORKDIR /home/container/BDSx2
 
 CMD ["/bin/bash", "entrypoint.sh" ]
