@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Make sure we're in the correct dir
-cd /home/container/BDSx2
+cd /home/container
 
 # Replace Startup Variables
 MODIFIED_STARTUP=`eval echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')`
-echo ":/home/container/BDSx2/$ ${MODIFIED_STARTUP}"
+echo ":/home/container/$ ${MODIFIED_STARTUP}"
 
 # Run the Server
 ${MODIFIED_STARTUP}
