@@ -1,22 +1,21 @@
 #################### DEVELOPMENT ####################
 FROM alpine:latest as builder
 
-ENV ROOT="/BDSx2" \
-    BDSX="/BDSx2/bdsx" \
-    BEDROCK="/BDSx2/bedrock_server" \
-    EXAMPLES="/BDSx2/example_and_test" \
-    PLUGINS="/BDSx2/plugins"
+
+USER root
+
+ENV ROOT="/home/BDSx2"
 
 RUN mkdir -p $ROOT
 
 RUN apk add git
 
-RUN git clone https://github.com/bdsx/bdsx.git /BDSx2/
+RUN git clone https://github.com/bdsx/bdsx.git /home/BDSx2/
 
 RUN cd $ROOT && \
     rm *.bat
 
-COPY entrypoint.sh /BDSx2/entrypoint.sh
+COPY entrypoint.sh /home/BDSx2/entrypoint.sh
 
 #################### PRODUCTION ####################
 FROM ubuntu:latest as production
@@ -61,18 +60,17 @@ RUN wine64 msiexec /i wine-mono-6.1.1-x86.msi && \
 
 RUN rm *.msi
 
-ENV ROOT="/BDSx2" \
-    BDSX="/BDSx2/bdsx" \
-    BEDROCK="/BDSx2/bedrock_server" \
-    EXAMPLES="/BDSx2/example_and_test" \
-    PLUGINS="/BDSx2/plugins"
+RUN chmod +x /home/BDSx2/entrypoint.sh
 
-VOLUME [ "/BDSx2" ]
+ENV ROOT="/home/BDSx2"
+
+VOLUME [ "/home/BDSx2" ]
 
 COPY --from=builder $ROOT $ROOT
 
-RUN chmod +x /BDSx2/entrypoint.sh
+USER bdsx2
+ENV USER=bdsx2 HOME=/home/BDSx2
 
-WORKDIR /BDSx2
+WORKDIR /home/BDSx2
 
-CMD ["/bin/bash", "entrypoint.sh"]
+CMD ["/bin/bash", "entrypoint.sh" ]
