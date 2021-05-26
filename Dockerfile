@@ -1,24 +1,10 @@
-#################### DEVELOPMENT ####################
-FROM alpine:latest as builder
+FROM ubuntu:latest
 
+ENV ROOT="/home/container/BDSx2" \
+    USER=container \
+    HOME=/home/container
 
 USER root
-
-ENV ROOT="/home/container/BDSx2"
-
-RUN mkdir -p $ROOT
-
-RUN apk add git
-
-RUN git clone https://github.com/bdsx/bdsx.git /home/BDSx2/
-
-RUN cd $ROOT && \
-    rm *.bat
-
-COPY ./entrypoint.sh /home/container/BDSx2/entrypoint.sh
-
-#################### PRODUCTION ####################
-FROM ubuntu:latest as production
 
 ENV TZ=UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -37,6 +23,7 @@ RUN DEBIAN_FRONTEND=noninteractive && \
     apt install -y --install-recommends winehq-stable mono-complete && \
     apt install -y --no-install-recommends \
     curl \
+    git \
     libcurl4 \
     nano \
     nodejs \
@@ -60,17 +47,21 @@ RUN wine64 msiexec /i wine-mono-6.1.1-x86.msi && \
 
 RUN rm *.msi
 
-RUN chmod +x /home/container/BDSx2/entrypoint.sh
+COPY ./entrypoint.sh /entrypoint.sh
 
-ENV ROOT="/home/container/BDSx2"
+RUN chmod +x /entrypoint.sh
+
+RUN useradd -m container
+
+RUN mkdir /home/container/BDSx2 && \
+    chown -R container:container /home/container/BDSx2
+
+USER container
+
+RUN git clone https://github.com/bdsx/bdsx.git /home/container/BDSx2
 
 VOLUME [ "/home/container/BDSx2" ]
 
-COPY --from=builder $ROOT $ROOT
-
-USER container
-ENV USER=container HOME=/home/container
-
 WORKDIR /home/container/BDSx2
 
-CMD ["/bin/bash", "entrypoint.sh" ]
+CMD ["/bin/bash", "/entrypoint.sh" ]
