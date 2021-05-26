@@ -54,14 +54,14 @@ RUN chmod +x /entrypoint.sh
 RUN useradd -m container
 
 RUN mkdir /home/container/BDSx2 && \
-    chown -R container:container /home/container/
+    chown -R 1000:1000 /home/container/
 
 USER container
 
 RUN git clone https://github.com/bdsx/bdsx.git /home/container/BDSx2
 
-VOLUME [ "/home/container/BDSx2" ]
+VOLUME [ "/home/container" ]
 
-WORKDIR /home/container/BDSx2
+WORKDIR /home/container
 
 CMD ["/bin/bash", "/entrypoint.sh" ]
